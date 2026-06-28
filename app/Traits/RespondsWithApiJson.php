@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 trait RespondsWithApiJson
@@ -49,6 +50,26 @@ trait RespondsWithApiJson
             message: $message,
             status: HttpResponse::HTTP_CREATED,
             meta: $meta,
+            headers: $headers,
+        );
+    }
+
+    protected function paginatedResponse(
+        ResourceCollection $resource,
+        ?string $message = null,
+        array $headers = [],
+    ): JsonResponse {
+        $paginator = $resource->resource;
+
+        return $this->successResponse(
+            data: $resource,
+            message: $message,
+            meta: [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ],
             headers: $headers,
         );
     }
