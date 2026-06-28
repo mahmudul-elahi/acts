@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdController;
 use App\Http\Controllers\Admin\DigController;
 use App\Http\Controllers\Admin\QuoteController;
+use App\Http\Controllers\Admin\SubscriptionPlanController;
 use App\Http\Controllers\Admin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,5 +37,13 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
         Route::get('{ad}', [AdController::class, 'show']);
         Route::match(['put', 'patch'], '{ad}', [AdController::class, 'update']);
         Route::delete('{ad}', [AdController::class, 'destroy']);
+    });
+
+    Route::prefix('subscription-plans')->group(function (): void {
+        Route::get('/', [SubscriptionPlanController::class, 'index']);
+        Route::post('/', [SubscriptionPlanController::class, 'store']);
+        Route::get('{subscriptionPlan}', [SubscriptionPlanController::class, 'show']);
+        Route::match(['put', 'patch'], '{subscriptionPlan}', [SubscriptionPlanController::class, 'update']);
+        Route::delete('{subscriptionPlan}', [SubscriptionPlanController::class, 'destroy']);
     });
 });
