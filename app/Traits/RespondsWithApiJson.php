@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -69,6 +70,36 @@ trait RespondsWithApiJson
                 'last_page' => $paginator->lastPage(),
                 'per_page' => $paginator->perPage(),
                 'total' => $paginator->total(),
+            ],
+            headers: $headers,
+        );
+    }
+
+    /**
+     * Build a JSON response for a cursor-paginated resource collection.
+     *
+     * Use with `Builder::cursorPaginate()` for large or append-only datasets
+     * where offset pagination is too costly. Clients request the next batch by
+     * passing the returned `next_cursor` value as the `?cursor=` query param.
+     *
+     * @param  array<string, string>  $headers
+     */
+    protected function cursorPaginatedResponse(
+        ResourceCollection $resource,
+        ?string $message = null,
+        array $headers = [],
+    ): JsonResponse {
+        /** @var CursorPaginator $paginator */
+        $paginator = $resource->resource;
+
+        return $this->successResponse(
+            data: $resource,
+            message: $message,
+            meta: [
+                'per_page' => $paginator->perPage(),
+                'next_cursor' => $paginator->nextCursor()?->encode(),
+                'prev_cursor' => $paginator->previousCursor()?->encode(),
+                'has_more' => $paginator->hasMorePages(),
             ],
             headers: $headers,
         );
