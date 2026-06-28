@@ -8,8 +8,11 @@ use App\Http\Requests\Auth\SendPasswordResetOtpRequest;
 use App\Http\Requests\Auth\VerifyPasswordResetOtpRequest;
 use App\Services\OtpService;
 use App\Services\PasswordResetService;
+use Dedoc\Scramble\Attributes\Endpoint;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 
+#[Group('Auth')]
 class PasswordResetController extends Controller
 {
     public function __construct(
@@ -17,9 +20,7 @@ class PasswordResetController extends Controller
         protected PasswordResetService $passwordResetService,
     ) {}
 
-    /**
-     * Send a password reset OTP to the user's email.
-     */
+    #[Endpoint(title: 'Send Password Reset OTP', description: 'Send a password reset OTP to the user\'s email.')]
     public function send(SendPasswordResetOtpRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -29,9 +30,7 @@ class PasswordResetController extends Controller
         return $this->successResponse(message: 'OTP sent to your email.');
     }
 
-    /**
-     * Resend a password reset OTP to the user's email.
-     */
+    #[Endpoint(title: 'Resend Password Reset OTP', description: 'Resend a password reset OTP to the user\'s email.')]
     public function resend(SendPasswordResetOtpRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -41,9 +40,7 @@ class PasswordResetController extends Controller
         return $this->successResponse(message: 'OTP resent to your email.');
     }
 
-    /**
-     * Verify the password reset OTP.
-     */
+    #[Endpoint(title: 'Verify Password Reset OTP', description: 'Verify the password reset OTP.')]
     public function verify(VerifyPasswordResetOtpRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -55,9 +52,7 @@ class PasswordResetController extends Controller
         return $this->errorResponse(message: 'Invalid or expired OTP.');
     }
 
-    /**
-     * Reset the user's password after OTP verification.
-     */
+    #[Endpoint(title: 'Reset Password', description: "Reset the user's password after OTP verification.")]
     public function reset(ResetPasswordRequest $request): JsonResponse
     {
         $validated = $request->validated();

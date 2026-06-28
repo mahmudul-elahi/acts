@@ -6,16 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\Auth\UserResource;
 use App\Services\LoginService;
+use Dedoc\Scramble\Attributes\Endpoint;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
+#[Group('Auth')]
 class LoginController extends Controller
 {
     public function __construct(protected LoginService $loginService) {}
 
-    /**
-     * Authenticate a user and return an API token.
-     */
+    #[Endpoint(title: 'Login', description: 'Authenticate a user and return an API token.')]
     public function __invoke(LoginRequest $request): JsonResponse
     {
         $result = $this->loginService->attempt($request->validated());

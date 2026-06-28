@@ -7,8 +7,11 @@ use App\Http\Requests\Auth\SendEmailVerificationOtpRequest;
 use App\Http\Requests\Auth\VerifyEmailRequest;
 use App\Services\EmailVerificationService;
 use App\Services\OtpService;
+use Dedoc\Scramble\Attributes\Endpoint;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 
+#[Group('Auth')]
 class VerificationController extends Controller
 {
     public function __construct(
@@ -16,9 +19,7 @@ class VerificationController extends Controller
         protected EmailVerificationService $emailVerificationService,
     ) {}
 
-    /**
-     * Send an email verification OTP to the user's email.
-     */
+    #[Endpoint(title: 'Send Verification OTP', description: 'Send an email verification OTP to the user\'s email.')]
     public function send(SendEmailVerificationOtpRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -28,9 +29,7 @@ class VerificationController extends Controller
         return $this->successResponse(message: 'OTP sent to your email.');
     }
 
-    /**
-     * Resend an email verification OTP to the user's email.
-     */
+    #[Endpoint(title: 'Resend Verification OTP', description: 'Resend an email verification OTP to the user\'s email.')]
     public function resend(SendEmailVerificationOtpRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -40,9 +39,7 @@ class VerificationController extends Controller
         return $this->successResponse(message: 'OTP resent to your email.');
     }
 
-    /**
-     * Verify the user's email using the OTP.
-     */
+    #[Endpoint(title: 'Verify Email', description: "Verify the user's email using the OTP.")]
     public function verify(VerifyEmailRequest $request): JsonResponse
     {
         if (! $this->emailVerificationService->verify($request->validated())) {

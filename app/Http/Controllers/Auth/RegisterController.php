@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Services\OtpService;
 use App\Services\RegistrationService;
+use Dedoc\Scramble\Attributes\Endpoint;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 
+#[Group('Auth')]
 class RegisterController extends Controller
 {
     public function __construct(
@@ -15,9 +18,7 @@ class RegisterController extends Controller
         protected OtpService $otpService,
     ) {}
 
-    /**
-     * Register a new user account.
-     */
+    #[Endpoint(title: 'Register', description: 'Register a new user account.')]
     public function __invoke(RegisterRequest $request): JsonResponse
     {
         $user = $this->registrationService->register($request->validated());
