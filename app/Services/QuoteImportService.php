@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Quote;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Reader\Csv as CsvReader;
 use PhpOffice\PhpSpreadsheet\Reader\IReader;
@@ -13,11 +15,18 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx as XlsxReader;
 class QuoteImportService
 {
     /**
+     * Number of rows to send per bulk insert. Keeps each query well within
+     * SQLite's bound-parameter ceiling while minimising round-trips.
+     */
+    private const INSERT_CHUNK_SIZE = 1000;
+
+    /**
      * Parse the uploaded spreadsheet and create quote records.
      *
      * Accepts CSV/XLSX/XLS with either a header row (columns: quote, author,
      * status, notes) or plain columns in that order. Rows without a quote are
-     * skipped.
+     * skipped. Valid rows are written with chunked bulk inserts so large files
+     * import in a handful of queries instead of one per row.
      *
      * @return array{imported: int, skipped: int}
      */
@@ -35,8 +44,10 @@ class QuoteImportService
             array_shift($rows);
         }
 
+        $now = Carbon::now();
         $imported = 0;
         $skipped = 0;
+        $batch = [];
 
         foreach ($rows as $row) {
             $quote = $this->valueAt($row, $map['quote']);
@@ -47,14 +58,26 @@ class QuoteImportService
                 continue;
             }
 
-            $user->quotes()->create([
+            $batch[] = [
+                'user_id' => $user->id,
                 'quote' => Str::squish((string) $quote),
                 'author' => $this->cleanAuthor($this->valueAt($row, $map['author'])),
                 'status' => $this->toStatus($this->valueAt($row, $map['status'])),
                 'notes' => $this->cleanNotes($this->valueAt($row, $map['notes'])),
-            ]);
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
 
             $imported++;
+
+            if (count($batch) >= self::INSERT_CHUNK_SIZE) {
+                Quote::insert($batch);
+                $batch = [];
+            }
+        }
+
+        if ($batch !== []) {
+            Quote::insert($batch);
         }
 
         return ['imported' => $imported, 'skipped' => $skipped];
