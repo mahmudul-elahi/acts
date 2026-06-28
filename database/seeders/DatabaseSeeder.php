@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             QuoteSeeder::class,
             DigSeeder::class,
+            AdSeeder::class,
         ]);
     }
 }
