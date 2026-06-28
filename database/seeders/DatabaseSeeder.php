@@ -13,7 +13,9 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        $this->call(RoleSeeder::class);
+        $this->call([
+            RoleSeeder::class,
+        ]);
 
         User::factory()->create([
             'first_name' => 'Regular',
@@ -28,5 +30,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@gmail.com',
             'password' => '12345678',
         ])->assignRole(UserRole::Admin->value);
+
+        $this->call([
+            QuoteSeeder::class,
+        ]);
     }
 }

@@ -1,6 +1,9 @@
 <?php
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Enums\UserRole;
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 /*
@@ -44,7 +47,20 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Authenticate as a freshly created admin user and return it.
+ */
+function actingAsAdmin(): User
 {
-    // ..
+    $guardName = (string) config('auth.defaults.guard', 'web');
+
+    Role::findOrCreate(UserRole::Admin->value, $guardName);
+    Role::findOrCreate(UserRole::User->value, $guardName);
+
+    $admin = User::factory()->create();
+    $admin->assignRole(UserRole::Admin->value);
+
+    Sanctum::actingAs($admin);
+
+    return $admin;
 }

@@ -3,25 +3,8 @@
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Laravel\Sanctum\Sanctum;
-use Spatie\Permission\Models\Role;
 
 uses(LazilyRefreshDatabase::class);
-
-function actingAsAdmin(): User
-{
-    $guardName = (string) config('auth.defaults.guard', 'web');
-
-    Role::findOrCreate(UserRole::Admin->value, $guardName);
-    Role::findOrCreate(UserRole::User->value, $guardName);
-
-    $admin = User::factory()->create();
-    $admin->assignRole(UserRole::Admin->value);
-
-    Sanctum::actingAs($admin);
-
-    return $admin;
-}
 
 test('admins receive a paginated list excluding other admins', function () {
     actingAsAdmin();
