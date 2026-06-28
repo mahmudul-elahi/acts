@@ -23,7 +23,7 @@ class AdService
             $data['image'] = $this->storeImage($image);
         }
 
-        return Ad::create($data);
+        return Ad::create($data)->refresh();
     }
 
     /**
