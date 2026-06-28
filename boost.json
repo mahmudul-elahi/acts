@@ -7,7 +7,8 @@
     "mcp": true,
     "nightwatch": false,
     "packages": [
-        "spatie/laravel-permission"
+        "spatie/laravel-permission",
+        "spatie/laravel-query-builder"
     ],
     "sail": false,
     "skills": [
@@ -15,6 +16,7 @@
         "socialite-development",
         "pest-testing",
         "tailwindcss-development",
-        "laravel-permission-development"
+        "laravel-permission-development",
+        "laravel-query-builder"
     ]
 }
