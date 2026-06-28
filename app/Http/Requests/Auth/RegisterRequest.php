@@ -27,7 +27,8 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
                 'string',
@@ -48,10 +49,26 @@ class RegisterRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $normalized = [];
+
+        if ($this->filled('first_name')) {
+            $normalized['first_name'] = Str::squish(
+                (string) $this->input('first_name'),
+            );
+        }
+
+        if ($this->filled('last_name')) {
+            $normalized['last_name'] = Str::squish(
+                (string) $this->input('last_name'),
+            );
+        }
+
         if ($this->filled('email')) {
-            $this->merge([
-                'email' => Str::lower((string) $this->input('email')),
-            ]);
+            $normalized['email'] = Str::lower((string) $this->input('email'));
+        }
+
+        if ($normalized !== []) {
+            $this->merge($normalized);
         }
     }
 }
