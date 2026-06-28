@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Laravel\Cashier\Billable;
 use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -52,6 +54,23 @@ class User extends Authenticatable implements Auditable
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Resolve a displayable URL for the avatar.
+     *
+     * Avatars from social login are stored as absolute URLs, while uploaded
+     * photos are stored as paths on the public disk.
+     */
+    public function avatarUrl(): ?string
+    {
+        if (! $this->avatar) {
+            return null;
+        }
+
+        return Str::startsWith($this->avatar, ['http://', 'https://'])
+            ? $this->avatar
+            : Storage::disk('public')->url($this->avatar);
     }
 
     /**

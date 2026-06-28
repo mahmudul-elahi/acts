@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -13,7 +14,14 @@ Route::prefix('auth')->group(function (): void {
     Route::post('login', LoginController::class)->middleware('throttle:10,1');
     Route::post('social', SocialAuthController::class)->middleware('throttle:10,1');
 
-    Route::get('me', ProfileController::class)->middleware('auth:sanctum');
+    Route::middleware('auth:sanctum')->group(function (): void {
+        Route::get('me', [ProfileController::class, 'show']);
+        // POST is included because PHP only parses multipart/form-data (file uploads) on POST.
+        Route::match(['post', 'put', 'patch'], 'profile', [ProfileController::class, 'update']);
+        Route::delete('profile/avatar', [ProfileController::class, 'deleteAvatar']);
+        Route::put('password', [ProfileController::class, 'updatePassword']);
+        Route::post('logout', LogoutController::class);
+    });
 
     Route::prefix('verify')->group(function (): void {
         Route::post('/', [VerificationController::class, 'verify'])->middleware('throttle:6,1');
