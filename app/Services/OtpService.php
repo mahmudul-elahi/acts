@@ -11,7 +11,7 @@ class OtpService
 {
     public function generateAndSend(string $email, string $type): void
     {
-        $otp = (string) rand(10000, 99999);
+        $otp = (string) random_int(10000, 99999);
 
         Otp::updateOrCreate(
             ['email' => $email, 'type' => $type],

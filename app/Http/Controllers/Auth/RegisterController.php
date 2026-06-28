@@ -25,6 +25,9 @@ class RegisterController extends Controller
 
         $this->otpService->generateAndSend($user->email, 'email_validation');
 
-        return $this->createdResponse(message: 'Registered successfully. Please verify your email with the OTP sent.');
+        return $this->createdResponse(
+            data: ['needs_verification' => true],
+            message: 'Registered successfully. Please verify your email with the OTP sent.',
+        );
     }
 }

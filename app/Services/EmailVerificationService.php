@@ -13,11 +13,16 @@ class EmailVerificationService
      */
     public function verify(array $data): bool
     {
+        $user = User::where('email', $data['email'])->first();
+
+        if (! $user) {
+            return false;
+        }
+
         if (! $this->otpService->verify($data['email'], $data['otp'], 'email_validation')) {
             return false;
         }
 
-        $user = User::where('email', $data['email'])->firstOrFail();
         $user->email_verified_at = now();
         $user->save();
 

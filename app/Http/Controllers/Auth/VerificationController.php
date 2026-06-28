@@ -19,16 +19,6 @@ class VerificationController extends Controller
         protected EmailVerificationService $emailVerificationService,
     ) {}
 
-    #[Endpoint(title: 'Send Verification OTP', description: 'Send an email verification OTP to the user\'s email.')]
-    public function send(SendEmailVerificationOtpRequest $request): JsonResponse
-    {
-        $validated = $request->validated();
-
-        $this->otpService->generateAndSend($validated['email'], 'email_validation');
-
-        return $this->successResponse(message: 'OTP sent to your email.');
-    }
-
     #[Endpoint(title: 'Resend Verification OTP', description: 'Resend an email verification OTP to the user\'s email.')]
     public function resend(SendEmailVerificationOtpRequest $request): JsonResponse
     {

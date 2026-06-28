@@ -14,11 +14,16 @@ class PasswordResetService
      */
     public function reset(array $data): bool
     {
+        $user = User::where('email', $data['email'])->first();
+
+        if (! $user) {
+            return false;
+        }
+
         if (! $this->otpService->verify($data['email'], $data['otp'], 'password_reset')) {
             return false;
         }
 
-        $user = User::where('email', $data['email'])->firstOrFail();
         $user->password = Hash::make($data['password']);
         $user->save();
 

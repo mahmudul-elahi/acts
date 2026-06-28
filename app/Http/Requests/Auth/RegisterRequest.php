@@ -43,7 +43,6 @@ class RegisterRequest extends FormRequest
                 'confirmed',
                 Password::defaults(),
             ],
-            'device_name' => ['nullable', 'string', 'max:255'],
         ];
     }
 
