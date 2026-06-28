@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdController;
 use App\Http\Controllers\Admin\DigController;
+use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\SubscriptionPlanController;
 use App\Http\Controllers\Admin\UserManagementController;
@@ -45,5 +46,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
         Route::get('{subscriptionPlan}', [SubscriptionPlanController::class, 'show']);
         Route::match(['put', 'patch'], '{subscriptionPlan}', [SubscriptionPlanController::class, 'update']);
         Route::delete('{subscriptionPlan}', [SubscriptionPlanController::class, 'destroy']);
+    });
+
+    Route::prefix('payments')->group(function (): void {
+        Route::get('/', [PaymentController::class, 'index']);
+        Route::get('overview', [PaymentController::class, 'overview']);
     });
 });

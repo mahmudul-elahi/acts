@@ -1,10 +1,25 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Models\SubscriptionPlan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 uses(LazilyRefreshDatabase::class);
+
+/**
+ * Give a user an active Cashier subscription on the given Stripe price.
+ */
+function subscribeUser(User $user, string $stripePrice): void
+{
+    $user->subscriptions()->forceCreate([
+        'type' => 'default',
+        'stripe_id' => 'sub_'.fake()->unique()->bothify('??????'),
+        'stripe_status' => 'active',
+        'stripe_price' => $stripePrice,
+        'quantity' => 1,
+    ]);
+}
 
 test('admins receive a paginated list excluding other admins', function () {
     actingAsAdmin();
@@ -121,4 +136,52 @@ test('admins cannot toggle their own account status', function () {
         ->assertJsonPath('message', 'You cannot change your own account status.');
 
     expect($admin->fresh()->status)->toBeTrue();
+});
+
+test('the user list reports a free subscription by default', function () {
+    actingAsAdmin();
+
+    $user = User::factory()->create();
+    $user->assignRole(UserRole::User->value);
+
+    $this->getJson('/api/admin/users')
+        ->assertSuccessful()
+        ->assertJsonPath('data.0.subscription', 'Free');
+});
+
+test('the user list reports the plan a subscribed user is on', function () {
+    actingAsAdmin();
+
+    SubscriptionPlan::factory()->yearly()->create(['stripe_price_id' => 'price_yearly']);
+
+    $user = User::factory()->create();
+    $user->assignRole(UserRole::User->value);
+    subscribeUser($user, 'price_yearly');
+
+    $this->getJson('/api/admin/users')
+        ->assertSuccessful()
+        ->assertJsonPath('data.0.subscription', 'Yearly');
+});
+
+test('users can be filtered by subscription type', function () {
+    actingAsAdmin();
+
+    SubscriptionPlan::factory()->monthly()->create(['stripe_price_id' => 'price_monthly']);
+    SubscriptionPlan::factory()->yearly()->create(['stripe_price_id' => 'price_yearly']);
+
+    $monthlyUser = User::factory()->create();
+    $freeUser = User::factory()->create();
+    $monthlyUser->assignRole(UserRole::User->value);
+    $freeUser->assignRole(UserRole::User->value);
+    subscribeUser($monthlyUser, 'price_monthly');
+
+    $this->getJson('/api/admin/users?filter[subscription]=monthly')
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.id', $monthlyUser->id);
+
+    $this->getJson('/api/admin/users?filter[subscription]=free')
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.id', $freeUser->id);
 });

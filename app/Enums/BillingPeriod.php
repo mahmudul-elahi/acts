@@ -9,7 +9,7 @@ enum BillingPeriod: string
     case OnePayment = 'one_payment';
 
     /**
-     * Human readable label for the billing period.
+     * Human readable label for the billing period (as shown on the plan form).
      */
     public function label(): string
     {
@@ -17,6 +17,18 @@ enum BillingPeriod: string
             self::Monthly => 'Month',
             self::Yearly => 'Year',
             self::OnePayment => 'One Payment',
+        };
+    }
+
+    /**
+     * Plan name as shown in subscription and payment listings.
+     */
+    public function planName(): string
+    {
+        return match ($this) {
+            self::Monthly => 'Monthly',
+            self::Yearly => 'Yearly',
+            self::OnePayment => 'Lifetime',
         };
     }
 

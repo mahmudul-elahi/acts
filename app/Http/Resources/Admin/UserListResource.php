@@ -15,6 +15,7 @@ class UserListResource extends JsonResource
             'last_name' => $this->last_name,
             'email' => $this->email,
             'status' => $this->status,
+            'subscription' => $this->subscription_label ?? 'Free',
             'role' => $this->whenLoaded('roles', fn () => $this->getRoleNames()->first()),
             'email_verified_at' => $this->email_verified_at?->toISOString(),
             'created_at' => $this->created_at?->toISOString(),
