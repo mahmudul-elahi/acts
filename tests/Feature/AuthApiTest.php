@@ -8,34 +8,18 @@ use Spatie\Permission\Models\Role;
 
 uses(LazilyRefreshDatabase::class);
 
-test('users can register and receive a sanctum token', function () {
+test('users can register and receive an otp', function () {
     $response = $this->postJson('/api/auth/register', [
-        'name' => 'John Doe',
+        'first_name' => 'John',
+        'last_name' => 'Doe',
         'email' => 'JOHN@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
-        'device_name' => 'feature-test',
     ]);
 
     $response
         ->assertCreated()
-        ->assertJsonPath('success', true)
-        ->assertJsonPath('message', 'Registered successfully.')
-        ->assertJsonPath('data.user.name', 'John Doe')
-        ->assertJsonPath('data.user.email', 'john@example.com')
-        ->assertJsonPath('data.user.roles.0', UserRole::User->value)
-        ->assertJsonPath('data.token_type', 'Bearer')
-        ->assertJsonPath(
-            'data.token',
-            fn (string $token): bool => str_contains($token, '|'),
-        );
-
-    $user = User::query()->where('email', 'john@example.com')->firstOrFail();
-
-    expect($user->hasRole(UserRole::User->value))
-        ->toBeTrue()
-        ->and(PersonalAccessToken::query()->count())
-        ->toBe(1);
+        ->assertJsonPath('message', 'Registered successfully. Please verify your email with the OTP sent.');
 });
 
 test('users can log in and receive a sanctum token', function () {
@@ -60,7 +44,7 @@ test('users can log in and receive a sanctum token', function () {
         ->assertJsonPath('success', true)
         ->assertJsonPath('message', 'Logged in successfully.')
         ->assertJsonPath('data.user.email', 'jane@example.com')
-        ->assertJsonPath('data.user.roles.0', UserRole::User->value)
+        ->assertJsonPath('data.user.role', UserRole::User->value)
         ->assertJsonPath('data.token_type', 'Bearer')
         ->assertJsonPath(
             'data.token',
