@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DigController;
 use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\UserManagementController;
 use Illuminate\Support\Facades\Route;
@@ -17,5 +18,13 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
         Route::get('{quote}', [QuoteController::class, 'show']);
         Route::match(['put', 'patch'], '{quote}', [QuoteController::class, 'update']);
         Route::delete('{quote}', [QuoteController::class, 'destroy']);
+    });
+
+    Route::prefix('digs')->group(function (): void {
+        Route::get('/', [DigController::class, 'index']);
+        Route::post('/', [DigController::class, 'store']);
+        Route::get('{dig}', [DigController::class, 'show']);
+        Route::match(['put', 'patch'], '{dig}', [DigController::class, 'update']);
+        Route::delete('{dig}', [DigController::class, 'destroy']);
     });
 });

@@ -8,7 +8,7 @@ use App\Http\Requests\Admin\StoreQuoteRequest;
 use App\Http\Requests\Admin\UpdateQuoteRequest;
 use App\Http\Resources\Admin\QuoteResource;
 use App\Models\Quote;
-use App\Services\QuoteImportService;
+use App\Services\QuoteService;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +19,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 #[Group('Admin - Content Management (Quotes)')]
 class QuoteController extends Controller
 {
+    public function __construct(private QuoteService $quotes) {}
+
     #[Endpoint(title: 'List Quotes', description: 'Get a paginated list of quotes. Filter by status (filter[status]=active|inactive|all, defaults to all).')]
     public function index(Request $request): JsonResponse
     {
@@ -36,7 +38,7 @@ class QuoteController extends Controller
     #[Endpoint(title: 'Create Quote', description: 'Add a single quote.')]
     public function store(StoreQuoteRequest $request): JsonResponse
     {
-        $quote = $request->user()->quotes()->create($request->validated());
+        $quote = $this->quotes->create($request->user(), $request->validated());
 
         return $this->createdResponse(
             data: new QuoteResource($quote),
@@ -45,9 +47,9 @@ class QuoteController extends Controller
     }
 
     #[Endpoint(title: 'Bulk Upload Quotes', description: 'Upload a CSV/XLSX/XLS file to create many quotes at once.')]
-    public function bulkUpload(BulkUploadQuoteRequest $request, QuoteImportService $importer): JsonResponse
+    public function bulkUpload(BulkUploadQuoteRequest $request): JsonResponse
     {
-        $result = $importer->import($request->file('file'), $request->user());
+        $result = $this->quotes->import($request->user(), $request->file('file'));
 
         return $this->successResponse(
             data: $result,
@@ -64,7 +66,7 @@ class QuoteController extends Controller
     #[Endpoint(title: 'Update Quote', description: 'Update an existing quote.')]
     public function update(UpdateQuoteRequest $request, Quote $quote): JsonResponse
     {
-        $quote->update($request->validated());
+        $quote = $this->quotes->update($quote, $request->validated());
 
         return $this->successResponse(
             data: new QuoteResource($quote),
@@ -75,7 +77,7 @@ class QuoteController extends Controller
     #[Endpoint(title: 'Delete Quote', description: 'Delete a quote.')]
     public function destroy(Quote $quote): JsonResponse
     {
-        $quote->delete();
+        $this->quotes->delete($quote);
 
         return $this->successResponse(message: 'Quote deleted successfully.');
     }
