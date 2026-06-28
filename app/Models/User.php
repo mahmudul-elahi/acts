@@ -6,6 +6,8 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -32,5 +34,27 @@ class User extends Authenticatable implements Auditable
             'password' => 'hashed',
             'status' => 'boolean',
         ];
+    }
+
+    /**
+     * Limit results to users created on the given calendar date.
+     */
+    #[Scope]
+    protected function createdDate(Builder $query, string $date): void
+    {
+        $query->whereDate('created_at', $date);
+    }
+
+    /**
+     * Limit results by account status. Anything other than "active"/"deactive" applies no filter.
+     */
+    #[Scope]
+    protected function status(Builder $query, string $value): void
+    {
+        match ($value) {
+            'active' => $query->where('status', true),
+            'deactive' => $query->where('status', false),
+            default => $query,
+        };
     }
 }
