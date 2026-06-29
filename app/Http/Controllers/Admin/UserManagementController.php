@@ -38,7 +38,7 @@ class UserManagementController extends Controller
                 AllowedFilter::callback('subscription', $this->filterBySubscription(...)),
             )
             ->defaultSort('-created_at')
-            ->paginate(perPage: $request->integer('per_page', 15))
+            ->paginate(perPage: $this->perPage($request))
             ->appends($request->query());
 
         $this->planResolver->attachLabels($users->getCollection());

@@ -12,7 +12,7 @@ use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-#[Group('Auth')]
+#[Group('Profile')]
 class ProfileController extends Controller
 {
     public function __construct(private ProfileService $profile) {}

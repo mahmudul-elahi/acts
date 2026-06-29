@@ -30,7 +30,7 @@ class DigController extends Controller
             ->withCount('layers')
             ->withSum('layers', 'xp')
             ->defaultSort('-created_at')
-            ->paginate(perPage: $request->integer('per_page', 15))
+            ->paginate(perPage: $this->perPage($request))
             ->appends($request->query());
 
         return $this->paginatedResponse(DigResource::collection($digs));

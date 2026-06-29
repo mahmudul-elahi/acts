@@ -62,6 +62,22 @@ test('the payments overview reports revenue and active subscription counts', fun
         ->assertJsonPath('data.lifetime.revenue', '111.11');
 });
 
+test('an oversized per_page request is capped at 100', function () {
+    actingAsAdmin();
+
+    $this->getJson('/api/admin/payments?per_page=100000')
+        ->assertSuccessful()
+        ->assertJsonPath('meta.per_page', 100);
+});
+
+test('a valid per_page request below the cap is respected', function () {
+    actingAsAdmin();
+
+    $this->getJson('/api/admin/payments?per_page=5')
+        ->assertSuccessful()
+        ->assertJsonPath('meta.per_page', 5);
+});
+
 test('guests cannot access payments', function () {
     $this->getJson('/api/admin/payments')->assertUnauthorized();
     $this->getJson('/api/admin/payments/overview')->assertUnauthorized();

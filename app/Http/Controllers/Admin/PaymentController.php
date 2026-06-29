@@ -28,7 +28,7 @@ class PaymentController extends Controller
             )
             ->allowedSorts('paid_at', 'amount', 'created_at')
             ->defaultSort('-created_at')
-            ->paginate(perPage: $request->integer('per_page', 15))
+            ->paginate(perPage: $this->perPage($request))
             ->appends($request->query());
 
         return $this->paginatedResponse(PaymentResource::collection($payments));

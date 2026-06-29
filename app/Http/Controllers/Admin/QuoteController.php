@@ -29,7 +29,7 @@ class QuoteController extends Controller
                 AllowedFilter::scope('status'),
             )
             ->defaultSort('-created_at')
-            ->paginate(perPage: $request->integer('per_page', 15))
+            ->paginate(perPage: $this->perPage($request))
             ->appends($request->query());
 
         return $this->paginatedResponse(QuoteResource::collection($quotes));
