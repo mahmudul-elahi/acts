@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdController;
 use App\Http\Controllers\Admin\DigController;
+use App\Http\Controllers\Admin\MurmurationPostController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\SubscriptionPlanController;
@@ -51,5 +52,12 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::prefix('payments')->group(function (): void {
         Route::get('/', [PaymentController::class, 'index']);
         Route::get('overview', [PaymentController::class, 'overview']);
+    });
+
+    Route::prefix('murmuration-posts')->group(function (): void {
+        Route::get('/', [MurmurationPostController::class, 'index']);
+        Route::get('{murmurationPost}', [MurmurationPostController::class, 'show']);
+        Route::post('{murmurationPost}/toggle-status', [MurmurationPostController::class, 'toggle']);
+        Route::delete('{murmurationPost}', [MurmurationPostController::class, 'destroy']);
     });
 });
