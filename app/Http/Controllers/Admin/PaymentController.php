@@ -11,7 +11,6 @@ use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Number;
 use Laravel\Cashier\Subscription;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -64,7 +63,7 @@ class PaymentController extends Controller
             ],
             'lifetime' => [
                 'purchases' => Payment::query()->succeeded()->where('type', 'one_time')->count(),
-                'revenue' => $this->money((int) $revenueByPeriod->get(BillingPeriod::OnePayment->value, 0)),
+                'revenue' => $this->money((int) Payment::query()->succeeded()->where('type', 'one_time')->sum('amount')),
             ],
         ];
 
@@ -86,10 +85,11 @@ class PaymentController extends Controller
     }
 
     /**
-     * Format an amount given in the smallest currency unit as a decimal string.
+     * Format an amount given in the smallest currency unit as a plain decimal
+     * string, without locale grouping so clients can parse it numerically.
      */
     private function money(int $cents): string
     {
-        return Number::format($cents / 100, precision: 2);
+        return number_format($cents / 100, 2, '.', '');
     }
 }

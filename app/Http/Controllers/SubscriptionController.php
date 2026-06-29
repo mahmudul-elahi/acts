@@ -39,7 +39,12 @@ class SubscriptionController extends Controller
     {
         $user = $request->user();
 
-        if ($user->hasPremiumAccess()) {
+        $subscription = $user->subscription(SubscriptionService::SUBSCRIPTION_NAME);
+
+        // Block when the user has access, or an in-progress subscription that
+        // has not fully ended (e.g. incomplete or past_due), to avoid creating
+        // a duplicate "default" subscription.
+        if ($user->hasPremiumAccess() || ($subscription && ! $subscription->ended())) {
             return $this->errorResponse(
                 message: 'You already have an active subscription.',
                 status: Response::HTTP_CONFLICT,

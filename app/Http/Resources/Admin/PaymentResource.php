@@ -5,7 +5,6 @@ namespace App\Http\Resources\Admin;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Number;
 
 /**
  * @mixin Payment
@@ -35,7 +34,7 @@ class PaymentResource extends JsonResource
             'payment_method' => 'Stripe',
             'card_brand' => $this->card_brand,
             'card_last_four' => $this->card_last_four,
-            'amount' => Number::format($this->amount / 100, precision: 2),
+            'amount' => number_format($this->amount / 100, 2, '.', ''),
             'currency' => strtoupper($this->currency),
             'status' => $this->status,
             'paid_at' => $this->paid_at?->toISOString(),

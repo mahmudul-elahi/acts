@@ -146,6 +146,26 @@ test('it rejects checkout when the user already has premium access', function ()
         ->assertJsonPath('message', 'You already have an active subscription.');
 });
 
+test('it rejects checkout when a subscription is still pending', function () {
+    $user = actingAsUser();
+
+    $plan = SubscriptionPlan::factory()->monthly()->syncedToStripe()->create();
+
+    // A past_due subscription is not "valid" (no premium access) but has not
+    // ended, so a new checkout would create a duplicate.
+    $user->subscriptions()->forceCreate([
+        'type' => 'default',
+        'stripe_id' => 'sub_pending',
+        'stripe_status' => 'past_due',
+        'stripe_price' => 'price_pending',
+        'quantity' => 1,
+    ]);
+
+    $this->postJson('/api/subscription/checkout', ['plan_id' => $plan->id])
+        ->assertStatus(409)
+        ->assertJsonPath('message', 'You already have an active subscription.');
+});
+
 test('it rejects checkout for a plan that is not on Stripe yet', function () {
     actingAsUser();
 
