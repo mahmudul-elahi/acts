@@ -64,3 +64,31 @@ function actingAsAdmin(): User
 
     return $admin;
 }
+
+/**
+ * Authenticate as a freshly created (non-admin) user and return it.
+ *
+ * @param  array<string, mixed>  $attributes
+ */
+function actingAsUser(array $attributes = []): User
+{
+    $user = User::factory()->create($attributes);
+
+    Sanctum::actingAs($user);
+
+    return $user;
+}
+
+/**
+ * Give a user an active Cashier subscription on the given Stripe price.
+ */
+function subscribeUser(User $user, string $stripePrice): void
+{
+    $user->subscriptions()->forceCreate([
+        'type' => 'default',
+        'stripe_id' => 'sub_'.fake()->unique()->bothify('??????'),
+        'stripe_status' => 'active',
+        'stripe_price' => $stripePrice,
+        'quantity' => 1,
+    ]);
+}

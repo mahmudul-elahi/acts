@@ -7,20 +7,6 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 uses(LazilyRefreshDatabase::class);
 
-/**
- * Give a user an active Cashier subscription on the given Stripe price.
- */
-function subscribeUser(User $user, string $stripePrice): void
-{
-    $user->subscriptions()->forceCreate([
-        'type' => 'default',
-        'stripe_id' => 'sub_'.fake()->unique()->bothify('??????'),
-        'stripe_status' => 'active',
-        'stripe_price' => $stripePrice,
-        'quantity' => 1,
-    ]);
-}
-
 test('admins receive a paginated list excluding other admins', function () {
     actingAsAdmin();
 

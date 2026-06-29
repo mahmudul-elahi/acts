@@ -95,3 +95,93 @@ test('unhandled webhook events are ignored', function () {
 
     expect(Payment::count())->toBe(0);
 });
+
+/**
+ * Build a one-time Checkout session webhook payload (the "Lifetime" plan).
+ *
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function checkoutSessionWebhook(array $overrides = []): array
+{
+    return [
+        'id' => 'evt_'.fake()->bothify('????????'),
+        'type' => 'checkout.session.completed',
+        'data' => ['object' => array_merge([
+            'id' => 'cs_'.fake()->bothify('????????'),
+            'mode' => 'payment',
+            'customer' => 'cus_test',
+            'payment_intent' => 'pi_test',
+            'amount_total' => 11111,
+            'currency' => 'usd',
+            'created' => 1750000000,
+            'metadata' => [],
+        ], $overrides)],
+    ];
+}
+
+test('a completed lifetime checkout grants access and records the payment', function () {
+    $plan = SubscriptionPlan::factory()->lifetime()->create();
+
+    $user = User::factory()->create(['lifetime_access' => false]);
+    $user->stripe_id = 'cus_test';
+    $user->save();
+
+    $this->mock(StripePaymentService::class, function (MockInterface $mock) {
+        $mock->shouldReceive('cardForPaymentIntent')->once()->with('pi_test')->andReturn(['brand' => 'visa', 'last_four' => '4242']);
+    });
+
+    $this->postJson('/stripe/webhook', checkoutSessionWebhook([
+        'metadata' => ['subscription_plan_id' => $plan->id],
+    ]))->assertSuccessful();
+
+    expect($user->fresh()->lifetime_access)->toBeTrue();
+
+    $payment = Payment::firstOrFail();
+
+    expect($payment->user_id)->toBe($user->id)
+        ->and($payment->subscription_plan_id)->toBe($plan->id)
+        ->and($payment->type)->toBe('one_time')
+        ->and($payment->amount)->toBe(11111)
+        ->and($payment->status)->toBe('succeeded')
+        ->and($payment->card_brand)->toBe('visa')
+        ->and($payment->card_last_four)->toBe('4242')
+        ->and($payment->stripe_id)->toBe('pi_test')
+        ->and($payment->paid_at)->not->toBeNull();
+});
+
+test('a subscription-mode checkout session is ignored', function () {
+    $user = User::factory()->create(['lifetime_access' => false]);
+    $user->stripe_id = 'cus_test';
+    $user->save();
+
+    $this->postJson('/stripe/webhook', checkoutSessionWebhook(['mode' => 'subscription']))
+        ->assertSuccessful();
+
+    expect($user->fresh()->lifetime_access)->toBeFalse()
+        ->and(Payment::count())->toBe(0);
+});
+
+test('a lifetime checkout for an unknown customer is ignored', function () {
+    $this->postJson('/stripe/webhook', checkoutSessionWebhook(['customer' => 'cus_unknown']))
+        ->assertSuccessful();
+
+    expect(Payment::count())->toBe(0);
+});
+
+test('a completed lifetime checkout is recorded only once', function () {
+    $user = User::factory()->create();
+    $user->stripe_id = 'cus_test';
+    $user->save();
+
+    $this->mock(StripePaymentService::class, function (MockInterface $mock) {
+        $mock->shouldReceive('cardForPaymentIntent')->andReturn(['brand' => null, 'last_four' => null]);
+    });
+
+    $payload = checkoutSessionWebhook(['payment_intent' => 'pi_dupe']);
+
+    $this->postJson('/stripe/webhook', $payload)->assertSuccessful();
+    $this->postJson('/stripe/webhook', $payload)->assertSuccessful();
+
+    expect(Payment::where('stripe_id', 'pi_dupe')->count())->toBe(1);
+});
