@@ -49,6 +49,34 @@ class StripePaymentService
     }
 
     /**
+     * Resolve the card brand and last four digits for a payment intent.
+     *
+     * Used for one-time Checkout payments, where only the payment intent id is
+     * present in the webhook payload. Card details are best-effort.
+     *
+     * @return array{brand: string|null, last_four: string|null}
+     */
+    public function cardForPaymentIntent(?string $paymentIntentId): array
+    {
+        $empty = ['brand' => null, 'last_four' => null];
+
+        if (! $paymentIntentId || ! $this->isConfigured()) {
+            return $empty;
+        }
+
+        try {
+            $charge = $this->stripe()->paymentIntents->retrieve(
+                $paymentIntentId,
+                ['expand' => ['latest_charge']],
+            )->latest_charge;
+
+            return $this->cardForCharge(is_string($charge) ? $charge : $charge?->id);
+        } catch (Throwable) {
+            return $empty;
+        }
+    }
+
+    /**
      * Resolve the underlying Stripe client.
      */
     protected function stripe(): StripeClient

@@ -67,6 +67,16 @@ class SubscriptionPlanFactory extends Factory
     }
 
     /**
+     * Indicate the plan offers a free trial.
+     */
+    public function withTrial(int $days = 7): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'trial_days' => $days,
+        ]);
+    }
+
+    /**
      * Indicate the plan is inactive.
      */
     public function inactive(): static

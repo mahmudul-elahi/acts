@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Admin;
+namespace App\Http\Resources;
 
 use App\Models\SubscriptionPlan;
 use Illuminate\Http\Request;
@@ -28,12 +28,11 @@ class SubscriptionPlanResource extends JsonResource
             'currency' => $this->currency,
             'billing_period' => $this->billing_period->value,
             'billing_period_label' => $this->billing_period->label(),
+            'plan_name' => $this->billing_period->planName(),
+            'is_recurring' => $this->billing_period->isRecurring(),
             'trial_days' => $this->trial_days,
+            'has_trial' => $this->hasTrial(),
             'features' => $this->features ?? [],
-            'stripe_product_id' => $this->stripe_product_id,
-            'stripe_price_id' => $this->stripe_price_id,
-            'status' => $this->status,
-            'created_at' => $this->created_at?->toISOString(),
         ];
     }
 }

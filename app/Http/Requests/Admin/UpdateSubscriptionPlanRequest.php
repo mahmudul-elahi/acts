@@ -33,6 +33,7 @@ class UpdateSubscriptionPlanRequest extends FormRequest
             'price' => ['sometimes', 'required', 'numeric', 'min:0', 'max:999999.99'],
             'currency' => ['sometimes', 'string', 'size:3'],
             'billing_period' => ['sometimes', 'required', Rule::enum(BillingPeriod::class)],
+            'trial_days' => ['nullable', 'integer', 'min:2', 'max:365'],
             'features' => ['nullable', 'array'],
             'features.*' => ['string', 'max:255'],
             'status' => ['sometimes', 'boolean'],

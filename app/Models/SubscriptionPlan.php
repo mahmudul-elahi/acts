@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['badge_name', 'title', 'sub_title', 'description', 'price', 'currency', 'billing_period', 'features', 'stripe_product_id', 'stripe_price_id', 'status'])]
+#[Fillable(['badge_name', 'title', 'sub_title', 'description', 'price', 'currency', 'billing_period', 'trial_days', 'features', 'stripe_product_id', 'stripe_price_id', 'status'])]
 class SubscriptionPlan extends Model
 {
     /** @use HasFactory<SubscriptionPlanFactory> */
@@ -27,6 +27,7 @@ class SubscriptionPlan extends Model
             'price' => 'decimal:2',
             'features' => 'array',
             'billing_period' => BillingPeriod::class,
+            'trial_days' => 'integer',
             'status' => 'boolean',
         ];
     }
@@ -37,6 +38,15 @@ class SubscriptionPlan extends Model
     public function unitAmount(): int
     {
         return (int) round((float) $this->price * 100);
+    }
+
+    /**
+     * Whether this plan offers a free trial. Stripe Checkout requires trials of
+     * at least 48 hours, and only recurring plans can be trialed.
+     */
+    public function hasTrial(): bool
+    {
+        return $this->billing_period->isRecurring() && (int) $this->trial_days >= 2;
     }
 
     /**

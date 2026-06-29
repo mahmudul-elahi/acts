@@ -20,7 +20,7 @@ use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['first_name', 'last_name', 'email', 'password', 'status', 'provider', 'provider_id', 'avatar', 'email_verified_at'])]
+#[Fillable(['first_name', 'last_name', 'email', 'password', 'status', 'lifetime_access', 'provider', 'provider_id', 'avatar', 'email_verified_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements Auditable
 {
@@ -48,6 +48,7 @@ class User extends Authenticatable implements Auditable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'status' => 'boolean',
+            'lifetime_access' => 'boolean',
         ];
     }
 
@@ -73,6 +74,15 @@ class User extends Authenticatable implements Auditable
     public function notificationSettings(): HasOne
     {
         return $this->hasOne(NotificationSetting::class);
+    }
+
+    /**
+     * Whether the user currently has premium access, either through an active
+     * subscription or a one-time lifetime purchase.
+     */
+    public function hasPremiumAccess(): bool
+    {
+        return $this->lifetime_access || $this->subscribed('default');
     }
 
     /**
