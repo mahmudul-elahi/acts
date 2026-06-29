@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +26,16 @@ class User extends Authenticatable implements Auditable
 {
     /** @use HasFactory<UserFactory> */
     use Billable, HasApiTokens, HasFactory, HasRoles, Notifiable, \OwenIt\Auditing\Auditable;
+
+    /**
+     * Give every newly created user a default set of notification settings.
+     */
+    protected static function booted(): void
+    {
+        static::created(function (User $user): void {
+            $user->notificationSettings()->create();
+        });
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -54,6 +65,14 @@ class User extends Authenticatable implements Auditable
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Get the user's notification preferences.
+     */
+    public function notificationSettings(): HasOne
+    {
+        return $this->hasOne(NotificationSetting::class);
     }
 
     /**
