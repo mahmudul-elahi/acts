@@ -36,6 +36,7 @@ class RegisterRequest extends FormRequest
                 'email',
                 'max:255',
                 Rule::unique(User::class, 'email'),
+                Rule::when(app()->isProduction(), ['indisposable']),
             ],
             'password' => [
                 'required',
