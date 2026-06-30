@@ -51,6 +51,30 @@ test('the feed can be filtered by topic', function () {
         ->assertJsonPath('data.0.topic.slug', 'reflection');
 });
 
+test('the feed is cursor paginated for load-more without overlap', function () {
+    actingAsUser();
+
+    // Newest-first ordering falls back to id, so the highest id comes first.
+    $posts = MurmurationPost::factory()->count(3)->create();
+    [$oldest, $middle, $newest] = $posts->sortBy('id')->values()->all();
+
+    $first = $this->getJson('/api/murmuration/posts?per_page=2')
+        ->assertSuccessful()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('data.0.id', $newest->id)
+        ->assertJsonPath('data.1.id', $middle->id)
+        ->assertJsonPath('meta.has_more', true);
+
+    expect($first->json('meta.next_cursor'))->not->toBeNull();
+
+    $this->getJson('/api/murmuration/posts?per_page=2&cursor='.$first->json('meta.next_cursor'))
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.id', $oldest->id)
+        ->assertJsonPath('meta.has_more', false)
+        ->assertJsonPath('meta.next_cursor', null);
+});
+
 test('guests cannot view the feed', function () {
     $this->getJson('/api/murmuration/posts')->assertUnauthorized();
 });

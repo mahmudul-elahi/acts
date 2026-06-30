@@ -36,10 +36,11 @@ class CommentController extends Controller
                 'likers as liked_by_user' => fn (Builder $query) => $query->whereKey($userId),
             ])
             ->latest()
-            ->paginate(perPage: $this->perPage($request))
-            ->appends($request->query());
+            ->latest('id')
+            ->cursorPaginate(perPage: $this->perPage($request))
+            ->withQueryString();
 
-        return $this->paginatedResponse(MurmurationCommentResource::collection($comments));
+        return $this->cursorPaginatedResponse(MurmurationCommentResource::collection($comments));
     }
 
     #[Endpoint(title: 'Add Comment', description: 'Add a top-level comment to a post. Available to any member.')]

@@ -31,11 +31,11 @@ class PostController extends Controller
             MurmurationPost::query()->active()->with(['user', 'topic'])->withCount($this->viewerCounts($userId))
         )
             ->allowedFilters(AllowedFilter::scope('topic', 'topicSlug'))
-            ->defaultSort('-created_at')
-            ->paginate(perPage: $this->perPage($request))
-            ->appends($request->query());
+            ->defaultSort('-created_at', '-id')
+            ->cursorPaginate(perPage: $this->perPage($request))
+            ->withQueryString();
 
-        return $this->paginatedResponse(MurmurationPostResource::collection($posts));
+        return $this->cursorPaginatedResponse(MurmurationPostResource::collection($posts));
     }
 
     #[Endpoint(title: 'Create Post', description: 'Publish a text, image or audio post. Audio is a premium feature. Send multipart/form-data with type, topic, optional body and (for image/audio) a media file up to 12 MB.')]
@@ -68,10 +68,11 @@ class PostController extends Controller
             ->with(['user', 'topic'])
             ->withCount($this->viewerCounts($userId))
             ->latest()
-            ->paginate(perPage: $this->perPage($request))
-            ->appends($request->query());
+            ->latest('id')
+            ->cursorPaginate(perPage: $this->perPage($request))
+            ->withQueryString();
 
-        return $this->paginatedResponse(MurmurationPostResource::collection($posts));
+        return $this->cursorPaginatedResponse(MurmurationPostResource::collection($posts));
     }
 
     #[Endpoint(title: 'Show Post', description: 'Get a single post. Deactivated posts are only visible to their author.')]

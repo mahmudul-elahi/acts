@@ -21,9 +21,9 @@ class MurmurationSeeder extends Seeder
         $topics = $this->topics();
 
         $posts = collect()
-            ->merge(MurmurationPost::factory()->count(14)->recycle($members)->recycle($topics)->create())
-            ->merge(MurmurationPost::factory()->count(4)->image()->recycle($members)->recycle($topics)->create())
-            ->merge(MurmurationPost::factory()->count(2)->audio()->recycle($members)->recycle($topics)->create());
+            ->merge(MurmurationPost::factory()->count(70)->recycle($members)->recycle($topics)->create())
+            ->merge(MurmurationPost::factory()->count(20)->image()->recycle($members)->recycle($topics)->create())
+            ->merge(MurmurationPost::factory()->count(10)->audio()->recycle($members)->recycle($topics)->create());
 
         $posts->each(fn (MurmurationPost $post) => $this->seedEngagement($post, $members));
     }
@@ -54,10 +54,10 @@ class MurmurationSeeder extends Seeder
     private function topics(): Collection
     {
         return collect(['Wellbeing', 'Productivity', 'Mindfulness', 'Community', 'Announcements'])
-            ->map(fn (string $name): MurmurationTopic => MurmurationTopic::factory()->create([
-                'name' => $name,
-                'slug' => Str::slug($name),
-            ]));
+            ->map(fn (string $name): MurmurationTopic => MurmurationTopic::query()->firstOrCreate(
+                ['slug' => Str::slug($name)],
+                ['name' => $name, 'status' => true],
+            ));
     }
 
     /**
