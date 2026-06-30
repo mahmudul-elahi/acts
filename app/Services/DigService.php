@@ -18,7 +18,9 @@ class DigService
         return DB::transaction(function () use ($data): Dig {
             $dig = Dig::create([
                 'title' => $data['title'],
+                'type' => $data['type'],
                 'status' => $data['status'] ?? true,
+                'published_on' => $data['published_on'] ?? null,
             ]);
 
             $dig->layers()->createMany($this->buildLayers($data['layers']));
@@ -36,7 +38,7 @@ class DigService
     public function update(Dig $dig, array $data): Dig
     {
         return DB::transaction(function () use ($dig, $data): Dig {
-            $attributes = array_intersect_key($data, array_flip(['title', 'status']));
+            $attributes = array_intersect_key($data, array_flip(['title', 'type', 'status', 'published_on']));
 
             if ($attributes !== []) {
                 $dig->update($attributes);

@@ -77,6 +77,22 @@ class User extends Authenticatable implements Auditable
     }
 
     /**
+     * Get the user's answers to dig layers.
+     */
+    public function digLayerAnswers(): HasMany
+    {
+        return $this->hasMany(DigLayerAnswer::class);
+    }
+
+    /**
+     * Total XP the user has earned from answering dig layers.
+     */
+    public function digXp(): int
+    {
+        return (int) $this->digLayerAnswers()->sum('xp_awarded');
+    }
+
+    /**
      * Whether the user currently has premium access, either through an active
      * subscription or a one-time lifetime purchase.
      */

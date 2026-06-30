@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DigType;
 use Database\Factories\DigFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['title', 'status'])]
+#[Fillable(['title', 'type', 'status', 'published_on'])]
 class Dig extends Model
 {
     /** @use HasFactory<DigFactory> */
@@ -24,7 +25,9 @@ class Dig extends Model
     protected function casts(): array
     {
         return [
+            'type' => DigType::class,
             'status' => 'boolean',
+            'published_on' => 'date',
         ];
     }
 
@@ -34,6 +37,15 @@ class Dig extends Model
     public function layers(): HasMany
     {
         return $this->hasMany(DigLayer::class)->orderBy('position');
+    }
+
+    /**
+     * Limit results to the active dig(s) scheduled for the given date.
+     */
+    #[Scope]
+    protected function publishedOn(Builder $query, string $date): void
+    {
+        $query->where('status', true)->whereDate('published_on', $date);
     }
 
     /**

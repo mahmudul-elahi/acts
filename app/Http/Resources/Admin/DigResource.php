@@ -21,7 +21,9 @@ class DigResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'type' => $this->type->value,
             'status' => $this->status,
+            'published_on' => $this->published_on?->toDateString(),
             'total_layers' => (int) ($this->layers_count ?? 0),
             'points' => (int) ($this->layers_sum_xp ?? 0),
             'layers' => DigLayerResource::collection($this->whenLoaded('layers')),

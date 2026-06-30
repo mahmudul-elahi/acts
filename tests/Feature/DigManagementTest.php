@@ -48,7 +48,9 @@ test('admins can create a dig with layers', function () {
 
     $response = $this->postJson('/api/admin/digs', [
         'title' => 'Emotional Intelligence',
+        'type' => 'emotional',
         'status' => true,
+        'published_on' => '2026-07-01',
         'layers' => [
             [
                 'title' => 'The Question',
@@ -72,6 +74,8 @@ test('admins can create a dig with layers', function () {
         ->assertCreated()
         ->assertJsonPath('message', 'Dig created successfully.')
         ->assertJsonPath('data.title', 'Emotional Intelligence')
+        ->assertJsonPath('data.type', 'emotional')
+        ->assertJsonPath('data.published_on', '2026-07-01')
         ->assertJsonPath('data.total_layers', 2)
         ->assertJsonPath('data.points', 40)
         ->assertJsonPath('data.layers.0.position', 1)

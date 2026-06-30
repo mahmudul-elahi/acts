@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\DigType;
 use App\Models\Dig;
 use App\Models\DigLayer;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -20,7 +21,9 @@ class DigFactory extends Factory
     {
         return [
             'title' => fake()->randomElement(['Emotional Intelligence', 'Pattern Awareness', 'Self Discovery']),
+            'type' => fake()->randomElement(DigType::cases()),
             'status' => true,
+            'published_on' => null,
         ];
     }
 
@@ -31,6 +34,16 @@ class DigFactory extends Factory
     {
         return $this->state(fn (array $attributes): array => [
             'status' => false,
+        ]);
+    }
+
+    /**
+     * Schedule the dig for a given day (defaults to today).
+     */
+    public function scheduledFor(?string $date = null): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'published_on' => $date ?? now()->toDateString(),
         ]);
     }
 

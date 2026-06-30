@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Enums\DigAnswerType;
+use App\Enums\DigType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -27,7 +28,9 @@ class StoreDigRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
+            'type' => ['required', Rule::enum(DigType::class)],
             'status' => ['sometimes', 'boolean'],
+            'published_on' => ['nullable', 'date'],
 
             'layers' => ['required', 'array', 'min:1'],
             'layers.*.title' => ['required', 'string', 'max:255'],

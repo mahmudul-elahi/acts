@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\User\DigController;
 use App\Http\Controllers\User\Murmuration\CommentController;
 use App\Http\Controllers\User\Murmuration\PostController;
 use App\Http\Controllers\User\Murmuration\TopicController;
@@ -8,6 +9,13 @@ use App\Http\Controllers\User\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function (): void {
+    Route::prefix('digs')->group(function (): void {
+        Route::get('today', [DigController::class, 'today']);
+        Route::get('stats', [DigController::class, 'stats']);
+        Route::get('{dig}', [DigController::class, 'show']);
+        Route::post('{dig}/layers/{layer}', [DigController::class, 'submitLayer'])->scopeBindings();
+    });
+
     Route::prefix('notification-settings')->group(function (): void {
         Route::get('/', [NotificationSettingController::class, 'show']);
         Route::match(['put', 'patch'], '/', [NotificationSettingController::class, 'update']);

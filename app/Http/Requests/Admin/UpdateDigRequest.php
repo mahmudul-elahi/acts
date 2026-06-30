@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Enums\DigAnswerType;
+use App\Enums\DigType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -30,7 +31,9 @@ class UpdateDigRequest extends FormRequest
     {
         return [
             'title' => ['sometimes', 'required', 'string', 'max:255'],
+            'type' => ['sometimes', 'required', Rule::enum(DigType::class)],
             'status' => ['sometimes', 'boolean'],
+            'published_on' => ['sometimes', 'nullable', 'date'],
 
             'layers' => ['sometimes', 'required', 'array', 'min:1'],
             'layers.*.title' => ['required', 'string', 'max:255'],
