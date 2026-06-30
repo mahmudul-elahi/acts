@@ -15,7 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[Group('Murmuration - Comments')]
+#[Group('User - Murmuration Comments')]
 class CommentController extends Controller
 {
     public function __construct(private MurmurationCommentService $comments) {}

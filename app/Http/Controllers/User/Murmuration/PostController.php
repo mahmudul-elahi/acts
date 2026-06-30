@@ -17,7 +17,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpFoundation\Response;
 
-#[Group('Murmuration - Posts')]
+#[Group('User - Murmuration Posts')]
 class PostController extends Controller
 {
     public function __construct(private MurmurationPostService $posts) {}

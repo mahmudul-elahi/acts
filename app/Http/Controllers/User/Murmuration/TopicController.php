@@ -10,7 +10,7 @@ use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-#[Group('Murmuration - Topics')]
+#[Group('User - Murmuration Topics')]
 class TopicController extends Controller
 {
     public function __construct(private MurmurationTopicService $topics) {}
