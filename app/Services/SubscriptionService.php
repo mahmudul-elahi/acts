@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 use Laravel\Cashier\Checkout;
 use Laravel\Cashier\Subscription;
 
@@ -63,9 +64,9 @@ class SubscriptionService
      *     access_type: string,
      *     status: string,
      *     on_trial: bool,
-     *     trial_ends_at: \Illuminate\Support\Carbon|null,
+     *     trial_ends_at: Carbon|null,
      *     on_grace_period: bool,
-     *     ends_at: \Illuminate\Support\Carbon|null,
+     *     ends_at: Carbon|null,
      *     plan: SubscriptionPlan|null,
      * }
      */
