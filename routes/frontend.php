@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\Murmuration\CommentController;
-use App\Http\Controllers\Murmuration\PostController;
-use App\Http\Controllers\Murmuration\TopicController;
-use App\Http\Controllers\NotificationSettingController;
-use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\User\Murmuration\CommentController;
+use App\Http\Controllers\User\Murmuration\PostController;
+use App\Http\Controllers\User\Murmuration\TopicController;
+use App\Http\Controllers\User\NotificationSettingController;
+use App\Http\Controllers\User\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function (): void {

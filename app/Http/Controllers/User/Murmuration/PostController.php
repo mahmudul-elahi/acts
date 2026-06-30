@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Murmuration;
+namespace App\Http\Controllers\User\Murmuration;
 
 use App\Enums\MurmurationPostType;
 use App\Http\Controllers\Controller;

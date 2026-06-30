@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Murmuration;
+namespace App\Http\Controllers\User\Murmuration;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Murmuration\StoreCommentRequest;
