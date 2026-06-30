@@ -86,6 +86,30 @@ class User extends Authenticatable implements Auditable
     }
 
     /**
+     * Whether the user wants alerts about comments and replies on their content.
+     */
+    public function wantsCommentAlerts(): bool
+    {
+        return $this->wantsAlert('comment_alerts');
+    }
+
+    /**
+     * Whether the user wants alerts about reactions (likes) on their posts.
+     */
+    public function wantsPostReactAlerts(): bool
+    {
+        return $this->wantsAlert('post_react_alerts');
+    }
+
+    /**
+     * Resolve a notification preference, defaulting to enabled when unset.
+     */
+    private function wantsAlert(string $setting): bool
+    {
+        return (bool) ($this->notificationSettings()->value($setting) ?? true);
+    }
+
+    /**
      * Resolve a displayable URL for the avatar.
      *
      * Avatars from social login are stored as absolute URLs, while uploaded

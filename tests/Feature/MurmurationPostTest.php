@@ -3,8 +3,11 @@
 use App\Models\MurmurationComment;
 use App\Models\MurmurationPost;
 use App\Models\MurmurationTopic;
+use App\Models\User;
+use App\Notifications\MurmurationPostLikedNotification;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 uses(LazilyRefreshDatabase::class);
@@ -239,6 +242,78 @@ test('a member can like and unlike a post', function () {
         ->assertSuccessful()
         ->assertJsonPath('data.liked', false)
         ->assertJsonPath('data.likes_count', 0);
+});
+
+test('liking a post notifies the author on database and broadcast', function () {
+    Notification::fake();
+
+    $author = User::factory()->create();
+    $post = MurmurationPost::factory()->create(['user_id' => $author->id]);
+    $liker = actingAsUser();
+
+    $this->postJson("/api/murmuration/posts/{$post->id}/like")->assertSuccessful();
+
+    Notification::assertSentTo(
+        $author,
+        MurmurationPostLikedNotification::class,
+        fn (MurmurationPostLikedNotification $notification, array $channels) => $notification->liker->is($liker)
+            && $channels === ['database', 'broadcast'],
+    );
+});
+
+test('post like notifications respect the author reaction alert setting', function () {
+    Notification::fake();
+
+    $author = User::factory()->create();
+    $author->notificationSettings()->update(['post_react_alerts' => false]);
+    $post = MurmurationPost::factory()->create(['user_id' => $author->id]);
+    actingAsUser();
+
+    $this->postJson("/api/murmuration/posts/{$post->id}/like")->assertSuccessful();
+
+    Notification::assertNothingSentTo($author);
+});
+
+test('liking your own post does not notify yourself', function () {
+    Notification::fake();
+
+    $author = actingAsUser();
+    $post = MurmurationPost::factory()->create(['user_id' => $author->id]);
+
+    $this->postJson("/api/murmuration/posts/{$post->id}/like")->assertSuccessful();
+
+    Notification::assertNothingSentTo($author);
+});
+
+test('a post like notification stores the shared payload shape', function () {
+    $author = User::factory()->create();
+    $post = MurmurationPost::factory()->create(['user_id' => $author->id]);
+    $liker = actingAsUser();
+
+    $this->postJson("/api/murmuration/posts/{$post->id}/like")->assertSuccessful();
+
+    $notification = $author->notifications()->sole();
+    $data = $notification->data;
+
+    expect($notification->type)->toBe('post_liked')
+        ->and($data)->toHaveKeys(['type', 'post_id', 'comment_id', 'parent_id', 'body', 'actor', 'message'])
+        ->and($data['type'])->toBe('post_liked')
+        ->and($data['comment_id'])->toBeNull()
+        ->and($data['parent_id'])->toBeNull()
+        ->and($data['body'])->toBeNull()
+        ->and($data['actor'])->toMatchArray(['id' => $liker->id]);
+});
+
+test('liking, unliking, then liking again notifies the author only once', function () {
+    $author = User::factory()->create();
+    $post = MurmurationPost::factory()->create(['user_id' => $author->id]);
+    actingAsUser();
+
+    $this->postJson("/api/murmuration/posts/{$post->id}/like")->assertSuccessful(); // like
+    $this->postJson("/api/murmuration/posts/{$post->id}/like")->assertSuccessful(); // unlike
+    $this->postJson("/api/murmuration/posts/{$post->id}/like")->assertSuccessful(); // like again
+
+    expect($author->notifications()->count())->toBe(1);
 });
 
 test('a member can save a post and list saved posts', function () {

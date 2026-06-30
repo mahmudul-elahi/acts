@@ -2,7 +2,10 @@
 
 use App\Models\MurmurationComment;
 use App\Models\MurmurationPost;
+use App\Models\User;
+use App\Notifications\MurmurationCommentNotification;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 
 uses(LazilyRefreshDatabase::class);
 
@@ -118,4 +121,99 @@ test('guests cannot comment', function () {
     $post = MurmurationPost::factory()->create();
 
     $this->postJson("/api/murmuration/posts/{$post->id}/comments", ['body' => 'hi'])->assertUnauthorized();
+});
+
+// ---------------------------------------------------------------------------
+// Notifications
+// ---------------------------------------------------------------------------
+
+test('commenting on a post notifies the author on database and broadcast', function () {
+    Notification::fake();
+
+    $author = User::factory()->create();
+    $post = MurmurationPost::factory()->create(['user_id' => $author->id]);
+    $commenter = actingAsUser();
+
+    $this->postJson("/api/murmuration/posts/{$post->id}/comments", ['body' => 'Lovely.'])->assertCreated();
+
+    Notification::assertSentTo(
+        $author,
+        MurmurationCommentNotification::class,
+        fn (MurmurationCommentNotification $notification, array $channels) => $notification->type === 'comment'
+            && $notification->comment->user_id === $commenter->id
+            && $channels === ['database', 'broadcast'],
+    );
+});
+
+test('comment notifications respect the author comment alert setting', function () {
+    Notification::fake();
+
+    $author = User::factory()->create();
+    $author->notificationSettings()->update(['comment_alerts' => false]);
+    $post = MurmurationPost::factory()->create(['user_id' => $author->id]);
+    actingAsUser();
+
+    $this->postJson("/api/murmuration/posts/{$post->id}/comments", ['body' => 'Hidden.'])->assertCreated();
+
+    Notification::assertNothingSentTo($author);
+});
+
+test('commenting on your own post does not notify yourself', function () {
+    Notification::fake();
+
+    $author = actingAsUser();
+    $post = MurmurationPost::factory()->create(['user_id' => $author->id]);
+
+    $this->postJson("/api/murmuration/posts/{$post->id}/comments", ['body' => 'Note to self.'])->assertCreated();
+
+    Notification::assertNothingSentTo($author);
+});
+
+test('replying to a comment notifies the commenter', function () {
+    Notification::fake();
+
+    $author = actingAsUser();
+    $post = MurmurationPost::factory()->create(['user_id' => $author->id]);
+    $commenter = User::factory()->create();
+    $comment = MurmurationComment::factory()->create([
+        'murmuration_post_id' => $post->id,
+        'user_id' => $commenter->id,
+    ]);
+
+    $this->postJson("/api/murmuration/comments/{$comment->id}/reply", ['body' => 'Thanks!'])->assertCreated();
+
+    Notification::assertSentTo(
+        $commenter,
+        MurmurationCommentNotification::class,
+        fn (MurmurationCommentNotification $notification) => $notification->type === 'reply',
+    );
+});
+
+test('a comment notification stores the shared payload shape', function () {
+    $author = User::factory()->create();
+    $post = MurmurationPost::factory()->create(['user_id' => $author->id]);
+    actingAsUser();
+
+    $this->postJson("/api/murmuration/posts/{$post->id}/comments", ['body' => 'Hi there'])->assertCreated();
+
+    $notification = $author->notifications()->sole();
+    $data = $notification->data;
+
+    expect($notification->type)->toBe('comment')
+        ->and($data)->toHaveKeys(['type', 'post_id', 'comment_id', 'parent_id', 'body', 'actor', 'message'])
+        ->and($data['type'])->toBe('comment')
+        ->and($data['comment_id'])->not->toBeNull()
+        ->and($data['parent_id'])->toBeNull()
+        ->and($data['body'])->toBe('Hi there');
+});
+
+test('a repeat comment from the same user notifies the author only once', function () {
+    $author = User::factory()->create();
+    $post = MurmurationPost::factory()->create(['user_id' => $author->id]);
+    actingAsUser();
+
+    $this->postJson("/api/murmuration/posts/{$post->id}/comments", ['body' => 'one'])->assertCreated();
+    $this->postJson("/api/murmuration/posts/{$post->id}/comments", ['body' => 'two'])->assertCreated();
+
+    expect($author->notifications()->count())->toBe(1);
 });

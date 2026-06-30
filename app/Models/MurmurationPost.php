@@ -58,11 +58,21 @@ class MurmurationPost extends Model
     }
 
     /**
-     * Users who have liked the post.
+     * The like records on the post, including the author-notified marker.
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(MurmurationPostLike::class);
+    }
+
+    /**
+     * Users who currently like the post (excludes soft-deleted unlikes).
      */
     public function likers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'murmuration_post_likes')->withTimestamps();
+        return $this->belongsToMany(User::class, 'murmuration_post_likes')
+            ->wherePivotNull('deleted_at')
+            ->withTimestamps();
     }
 
     /**
