@@ -4,8 +4,8 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Subscription\CheckoutSubscriptionRequest;
-use App\Http\Resources\SubscriptionPlanResource;
-use App\Http\Resources\SubscriptionStatusResource;
+use App\Http\Resources\User\SubscriptionPlanResource;
+use App\Http\Resources\User\SubscriptionStatusResource;
 use App\Models\SubscriptionPlan;
 use App\Services\SubscriptionService;
 use Dedoc\Scramble\Attributes\Endpoint;

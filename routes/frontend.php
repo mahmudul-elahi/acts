@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\User\DigController;
+use App\Http\Controllers\User\JournalController;
+use App\Http\Controllers\User\JournalTagController;
 use App\Http\Controllers\User\Murmuration\CommentController;
 use App\Http\Controllers\User\Murmuration\PostController;
 use App\Http\Controllers\User\Murmuration\TopicController;
@@ -28,6 +30,18 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('checkout', [SubscriptionController::class, 'checkout']);
         Route::post('cancel', [SubscriptionController::class, 'cancel']);
         Route::post('resume', [SubscriptionController::class, 'resume']);
+    });
+
+    Route::prefix('journals')->group(function (): void {
+        Route::get('tags', [JournalTagController::class, 'index']);
+
+        Route::get('/', [JournalController::class, 'index']);
+        Route::post('/', [JournalController::class, 'store']);
+        Route::get('favorites', [JournalController::class, 'favorites']);
+        Route::get('{journal}', [JournalController::class, 'show']);
+        Route::match(['put', 'patch'], '{journal}', [JournalController::class, 'update']);
+        Route::delete('{journal}', [JournalController::class, 'destroy']);
+        Route::post('{journal}/favorite', [JournalController::class, 'favorite']);
     });
 
     Route::prefix('murmuration')->group(function (): void {

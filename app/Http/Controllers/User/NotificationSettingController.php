@@ -4,7 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NotificationSetting\UpdateNotificationSettingsRequest;
-use App\Http\Resources\NotificationSettingResource;
+use App\Http\Resources\User\NotificationSettingResource;
 use App\Services\NotificationSettingService;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;

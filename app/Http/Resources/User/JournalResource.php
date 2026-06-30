@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\User;
 
-use App\Models\MurmurationPost;
+use App\Models\Journal;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin MurmurationPost
+ * @mixin Journal
  */
-class MurmurationPostResource extends JsonResource
+class JournalResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -22,18 +22,16 @@ class MurmurationPostResource extends JsonResource
         return [
             'id' => $this->id,
             'type' => $this->type->value,
+            'title' => $this->title,
             'body' => $this->body,
             'media_url' => $this->mediaUrl(),
-            'topic' => $this->whenLoaded('topic', fn (): ?array => $this->topic ? [
-                'id' => $this->topic->id,
-                'name' => $this->topic->name,
-                'slug' => $this->topic->slug,
-            ] : null),
+            'tags' => $this->whenLoaded('tags', fn (): array => $this->tags
+                ->map(fn ($tag): array => ['id' => $tag->id, 'name' => $tag->name, 'slug' => $tag->slug])
+                ->all()),
             'author' => $this->whenLoaded('user', fn (): ?array => $this->author($this->user)),
-            'likes_count' => (int) ($this->likers_count ?? 0),
-            'comments_count' => (int) ($this->comments_count ?? 0),
-            'is_liked' => (bool) ($this->liked_by_user ?? false),
-            'is_saved' => (bool) ($this->saved_by_user ?? false),
+            'favorites_count' => (int) ($this->favoriters_count ?? 0),
+            'is_favorited' => (bool) ($this->favorited_by_user ?? false),
+            'is_mine' => $request->user()?->getKey() === $this->user_id,
             'created_at' => $this->created_at?->toISOString(),
         ];
     }

@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\User;
 
-use App\Models\MurmurationComment;
+use App\Models\MurmurationPost;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin MurmurationComment
+ * @mixin MurmurationPost
  */
-class MurmurationCommentResource extends JsonResource
+class MurmurationPostResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -21,16 +21,19 @@ class MurmurationCommentResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'type' => $this->type->value,
             'body' => $this->body,
+            'media_url' => $this->mediaUrl(),
+            'topic' => $this->whenLoaded('topic', fn (): ?array => $this->topic ? [
+                'id' => $this->topic->id,
+                'name' => $this->topic->name,
+                'slug' => $this->topic->slug,
+            ] : null),
             'author' => $this->whenLoaded('user', fn (): ?array => $this->author($this->user)),
             'likes_count' => (int) ($this->likers_count ?? 0),
+            'comments_count' => (int) ($this->comments_count ?? 0),
             'is_liked' => (bool) ($this->liked_by_user ?? false),
-            'reply' => $this->whenLoaded('reply', fn (): ?array => $this->reply ? [
-                'id' => $this->reply->id,
-                'body' => $this->reply->body,
-                'author' => $this->author($this->reply->user),
-                'created_at' => $this->reply->created_at?->toISOString(),
-            ] : null),
+            'is_saved' => (bool) ($this->saved_by_user ?? false),
             'created_at' => $this->created_at?->toISOString(),
         ];
     }

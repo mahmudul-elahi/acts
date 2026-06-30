@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\User\Murmuration;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\MurmurationTopicResource;
+use App\Http\Resources\User\MurmurationTopicResource;
 use App\Services\MurmurationTopicService;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;

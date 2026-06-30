@@ -5,7 +5,7 @@ namespace App\Http\Controllers\User\Murmuration;
 use App\Enums\MurmurationPostType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Murmuration\StorePostRequest;
-use App\Http\Resources\MurmurationPostResource;
+use App\Http\Resources\User\MurmurationPostResource;
 use App\Models\MurmurationPost;
 use App\Services\MurmurationPostService;
 use Dedoc\Scramble\Attributes\Endpoint;

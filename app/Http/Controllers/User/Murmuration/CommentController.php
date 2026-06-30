@@ -4,7 +4,7 @@ namespace App\Http\Controllers\User\Murmuration;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Murmuration\StoreCommentRequest;
-use App\Http\Resources\MurmurationCommentResource;
+use App\Http\Resources\User\MurmurationCommentResource;
 use App\Models\MurmurationComment;
 use App\Models\MurmurationPost;
 use App\Services\MurmurationCommentService;
