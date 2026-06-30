@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DigProgressService
 {
+    public function __construct(private LevelService $levels) {}
+
     /**
      * Get the active dig scheduled for today, with the user's progress, or null.
      */
@@ -55,14 +57,15 @@ class DigProgressService
     }
 
     /**
-     * Summarise the user's dig engagement for the Exercises header.
+     * Summarise the user's dig engagement for the Exercises header, including
+     * the derived excavation level for the "Grow Yourself" card.
      *
      * @return array<string, int>
      */
     public function stats(User $user): array
     {
         return [
-            'total_xp' => $user->digXp(),
+            ...$this->levels->forXp($user->digXp()),
             'layers_completed' => $user->digLayerAnswers()->count(),
             'digs_completed' => $this->digsCompleted($user),
         ];

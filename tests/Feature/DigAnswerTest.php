@@ -161,8 +161,27 @@ test('stats returns the total earned xp and completion counts', function () {
     $this->getJson('/api/digs/stats')
         ->assertSuccessful()
         ->assertJsonPath('data.total_xp', 40)
+        ->assertJsonPath('data.level', 1)
+        ->assertJsonPath('data.xp_into_level', 40)
+        ->assertJsonPath('data.xp_per_level', 160)
+        ->assertJsonPath('data.xp_to_next', 120)
         ->assertJsonPath('data.layers_completed', 2)
         ->assertJsonPath('data.digs_completed', 1);
+});
+
+test('stats reports the excavation level once enough xp crosses a threshold', function () {
+    actingAsUser();
+    $dig = Dig::factory()->scheduledFor()->create();
+    $layer = DigLayer::factory()->for($dig)->create(['xp' => 160, 'options' => ['Fear'], 'include_other' => false]);
+
+    $this->postJson("/api/digs/{$dig->id}/layers/{$layer->id}", ['selected_option' => 'Fear'])->assertSuccessful();
+
+    $this->getJson('/api/digs/stats')
+        ->assertSuccessful()
+        ->assertJsonPath('data.total_xp', 160)
+        ->assertJsonPath('data.level', 2)
+        ->assertJsonPath('data.xp_into_level', 0)
+        ->assertJsonPath('data.xp_to_next', 160);
 });
 
 test('show returns the dig with the user per-layer progress', function () {
