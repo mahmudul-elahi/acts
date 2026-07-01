@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\SocialLoginRequest;
 use App\Http\Resources\Auth\UserResource;
-use App\Services\SocialAuthService;
+use App\Services\Auth\SocialAuthService;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
