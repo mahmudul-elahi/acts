@@ -8,7 +8,7 @@ use App\Http\Requests\Admin\StoreQuoteRequest;
 use App\Http\Requests\Admin\UpdateQuoteRequest;
 use App\Http\Resources\Admin\QuoteResource;
 use App\Models\Quote;
-use App\Services\QuoteService;
+use App\Services\Quote\QuoteService;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;

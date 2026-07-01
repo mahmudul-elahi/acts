@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Quote;
 
 use App\Models\Quote;
 use App\Models\User;
@@ -38,6 +38,14 @@ class QuoteService
     public function delete(Quote $quote): void
     {
         $quote->delete();
+    }
+
+    /**
+     * Toggle the current user's favorite on a quote. Returns true when now favorited.
+     */
+    public function toggleFavorite(Quote $quote, User $user): bool
+    {
+        return $quote->favoriters()->toggle($user->getKey())['attached'] !== [];
     }
 
     /**
