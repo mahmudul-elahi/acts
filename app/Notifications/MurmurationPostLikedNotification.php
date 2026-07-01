@@ -6,10 +6,11 @@ use App\Models\MurmurationPost;
 use App\Models\User;
 use App\Traits\BuildsMurmurationNotification;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class MurmurationPostLikedNotification extends Notification
+class MurmurationPostLikedNotification extends Notification implements ShouldQueue
 {
     use BuildsMurmurationNotification, Queueable;
 

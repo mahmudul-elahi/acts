@@ -5,11 +5,12 @@ namespace App\Notifications;
 use App\Models\MurmurationComment;
 use App\Traits\BuildsMurmurationNotification;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
 
-class MurmurationCommentNotification extends Notification
+class MurmurationCommentNotification extends Notification implements ShouldQueue
 {
     use BuildsMurmurationNotification, Queueable;
 
