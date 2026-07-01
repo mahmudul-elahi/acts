@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Subscription;
 
 use App\Enums\BillingPeriod;
 use App\Models\Payment;

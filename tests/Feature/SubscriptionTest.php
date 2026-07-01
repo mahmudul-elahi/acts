@@ -2,7 +2,7 @@
 
 use App\Models\Payment;
 use App\Models\SubscriptionPlan;
-use App\Services\SubscriptionService;
+use App\Services\Subscription\SubscriptionService;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Laravel\Cashier\Checkout;
 use Mockery\MockInterface;

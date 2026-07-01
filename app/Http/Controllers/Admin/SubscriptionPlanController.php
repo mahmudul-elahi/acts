@@ -7,7 +7,7 @@ use App\Http\Requests\Admin\StoreSubscriptionPlanRequest;
 use App\Http\Requests\Admin\UpdateSubscriptionPlanRequest;
 use App\Http\Resources\Admin\SubscriptionPlanResource;
 use App\Models\SubscriptionPlan;
-use App\Services\SubscriptionPlanService;
+use App\Services\Subscription\SubscriptionPlanService;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;

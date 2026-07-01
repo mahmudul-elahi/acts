@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\UserListResource;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
-use App\Services\UserPlanResolver;
+use App\Services\Subscription\UserPlanResolver;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Database\Eloquent\Builder;
