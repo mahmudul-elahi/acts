@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Journal;
 
 use App\Enums\JournalType;
 use App\Models\Journal;

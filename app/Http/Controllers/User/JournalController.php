@@ -8,7 +8,7 @@ use App\Http\Requests\Journal\StoreJournalRequest;
 use App\Http\Requests\Journal\UpdateJournalRequest;
 use App\Http\Resources\User\JournalResource;
 use App\Models\Journal;
-use App\Services\JournalService;
+use App\Services\Journal\JournalService;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Database\Eloquent\Builder;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Journal;
 
 use App\Models\JournalTag;
 use Illuminate\Database\Eloquent\Collection;
