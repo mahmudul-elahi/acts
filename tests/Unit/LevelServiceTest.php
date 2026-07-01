@@ -1,6 +1,6 @@
 <?php
 
-use App\Services\LevelService;
+use App\Services\Dig\LevelService;
 
 test('a fresh user with no xp is level 1 at the start of the bar', function () {
     expect((new LevelService)->forXp(0))->toBe([

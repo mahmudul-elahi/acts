@@ -7,7 +7,7 @@ use App\Http\Requests\User\SubmitDigLayerRequest;
 use App\Http\Resources\User\DigResource;
 use App\Models\Dig;
 use App\Models\DigLayer;
-use App\Services\DigProgressService;
+use App\Services\Dig\DigProgressService;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;

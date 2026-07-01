@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Dig;
 
 use App\Models\Dig;
 use App\Models\DigLayer;
 use App\Models\DigLayerAnswer;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 class DigProgressService
 {
@@ -66,9 +67,48 @@ class DigProgressService
     {
         return [
             ...$this->levels->forXp($user->digXp()),
+            'current_streak' => $this->currentStreak($user),
             'layers_completed' => $user->digLayerAnswers()->count(),
             'digs_completed' => $this->digsCompleted($user),
         ];
+    }
+
+    /**
+     * Count the consecutive days, ending today (or yesterday, so a streak isn't
+     * lost until a full day is missed), on which the user answered a dig layer.
+     */
+    public function currentStreak(User $user): int
+    {
+        $days = $user->digLayerAnswers()
+            ->selectRaw('DATE(created_at) as day')
+            ->distinct()
+            ->orderByDesc('day')
+            ->pluck('day')
+            ->all();
+
+        if ($days === []) {
+            return 0;
+        }
+
+        $today = Carbon::today();
+
+        if ($days[0] !== $today->toDateString() && $days[0] !== $today->copy()->subDay()->toDateString()) {
+            return 0;
+        }
+
+        $expected = Carbon::parse($days[0]);
+        $streak = 0;
+
+        foreach ($days as $day) {
+            if ($day !== $expected->toDateString()) {
+                break;
+            }
+
+            $streak++;
+            $expected->subDay();
+        }
+
+        return $streak;
     }
 
     /**
