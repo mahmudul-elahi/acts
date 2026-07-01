@@ -6,7 +6,9 @@ use App\Http\Controllers\User\JournalTagController;
 use App\Http\Controllers\User\Murmuration\CommentController;
 use App\Http\Controllers\User\Murmuration\PostController;
 use App\Http\Controllers\User\Murmuration\TopicController;
+use App\Http\Controllers\User\NotificationController;
 use App\Http\Controllers\User\NotificationSettingController;
+use App\Http\Controllers\User\QuoteController;
 use App\Http\Controllers\User\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +23,23 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::prefix('notification-settings')->group(function (): void {
         Route::get('/', [NotificationSettingController::class, 'show']);
         Route::match(['put', 'patch'], '/', [NotificationSettingController::class, 'update']);
+    });
+
+    Route::prefix('notifications')->group(function (): void {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('unread-count', [NotificationController::class, 'unreadCount']);
+        Route::post('read-all', [NotificationController::class, 'markAllRead']);
+        Route::post('{notification}/read', [NotificationController::class, 'markRead']);
+    });
+
+    Route::prefix('quotes')->group(function (): void {
+        Route::get('/', [QuoteController::class, 'index']);
+        Route::post('/', [QuoteController::class, 'store']);
+        Route::get('favorites', [QuoteController::class, 'favorites']);
+        Route::get('{quote}', [QuoteController::class, 'show']);
+        Route::match(['put', 'patch'], '{quote}', [QuoteController::class, 'update']);
+        Route::delete('{quote}', [QuoteController::class, 'destroy']);
+        Route::post('{quote}/favorite', [QuoteController::class, 'favorite']);
     });
 
     Route::get('subscription-plans', [SubscriptionController::class, 'plans']);
