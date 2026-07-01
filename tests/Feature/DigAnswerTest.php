@@ -165,6 +165,7 @@ test('stats returns the total earned xp and completion counts', function () {
         ->assertJsonPath('data.xp_into_level', 40)
         ->assertJsonPath('data.xp_per_level', 160)
         ->assertJsonPath('data.xp_to_next', 120)
+        ->assertJsonPath('data.current_streak', 1)
         ->assertJsonPath('data.layers_completed', 2)
         ->assertJsonPath('data.digs_completed', 1);
 });
