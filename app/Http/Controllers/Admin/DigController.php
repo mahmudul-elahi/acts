@@ -7,7 +7,7 @@ use App\Http\Requests\Admin\StoreDigRequest;
 use App\Http\Requests\Admin\UpdateDigRequest;
 use App\Http\Resources\Admin\DigResource;
 use App\Models\Dig;
-use App\Services\DigService;
+use App\Services\Dig\DigService;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;

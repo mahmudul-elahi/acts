@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Dig;
 
 use App\Enums\DigAnswerType;
 use App\Models\Dig;
@@ -8,14 +8,17 @@ use Illuminate\Support\Facades\DB;
 
 class DigService
 {
+    public function __construct(private DigReminderService $reminders) {}
+
     /**
-     * Create a dig together with its ordered layers.
+     * Create a dig together with its ordered layers, then (for an active dig)
+     * alert members that a new dig is ready to complete.
      *
      * @param  array<string, mixed>  $data
      */
     public function create(array $data): Dig
     {
-        return DB::transaction(function () use ($data): Dig {
+        $dig = DB::transaction(function () use ($data): Dig {
             $dig = Dig::create([
                 'title' => $data['title'],
                 'type' => $data['type'],
@@ -25,8 +28,14 @@ class DigService
 
             $dig->layers()->createMany($this->buildLayers($data['layers']));
 
-            return $this->loadAggregates($dig);
+            return $dig;
         });
+
+        if ($dig->status) {
+            $this->reminders->sendForDig($dig);
+        }
+
+        return $this->loadAggregates($dig);
     }
 
     /**
