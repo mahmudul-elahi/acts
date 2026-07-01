@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Murmuration;
 
 use App\Models\MurmurationTopic;
 use Illuminate\Database\Eloquent\Collection;

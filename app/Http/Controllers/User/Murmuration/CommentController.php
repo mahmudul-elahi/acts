@@ -7,7 +7,7 @@ use App\Http\Requests\Murmuration\StoreCommentRequest;
 use App\Http\Resources\User\MurmurationCommentResource;
 use App\Models\MurmurationComment;
 use App\Models\MurmurationPost;
-use App\Services\MurmurationCommentService;
+use App\Services\Murmuration\MurmurationCommentService;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Database\Eloquent\Builder;

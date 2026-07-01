@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Murmuration\StorePostRequest;
 use App\Http\Resources\User\MurmurationPostResource;
 use App\Models\MurmurationPost;
-use App\Services\MurmurationPostService;
+use App\Services\Murmuration\MurmurationPostService;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Database\Eloquent\Builder;
