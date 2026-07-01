@@ -118,6 +118,14 @@ class User extends Authenticatable implements Auditable
     }
 
     /**
+     * Whether the user wants alerts about their subscription (e.g. upcoming expiry).
+     */
+    public function wantsSubscriptionAlerts(): bool
+    {
+        return $this->wantsAlert('subscription_alerts');
+    }
+
+    /**
      * Resolve a notification preference, defaulting to enabled when unset.
      */
     private function wantsAlert(string $setting): bool
