@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\User\AdController;
 use App\Http\Controllers\User\DigController;
 use App\Http\Controllers\User\JournalController;
 use App\Http\Controllers\User\JournalTagController;
@@ -13,6 +14,10 @@ use App\Http\Controllers\User\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function (): void {
+    Route::prefix('ads')->group(function (): void {
+        Route::get('next', [AdController::class, 'next']);
+    });
+
     Route::prefix('digs')->group(function (): void {
         Route::get('today', [DigController::class, 'today']);
         Route::get('stats', [DigController::class, 'stats']);

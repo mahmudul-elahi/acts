@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['title', 'description', 'image', 'link', 'coupon_code', 'publish_date', 'expiration_date', 'status'])]
 class Ad extends Model
@@ -49,5 +50,24 @@ class Ad extends Model
     protected function publishDate(Builder $query, string $date): void
     {
         $query->whereDate('publish_date', $date);
+    }
+
+    /**
+     * Limit results to ads that are currently live and within their date window.
+     */
+    #[Scope]
+    protected function active(Builder $query): void
+    {
+        $query->where('status', true)
+            ->where('publish_date', '<=', now()->toDateString())
+            ->where(function (Builder $query): void {
+                $query->whereNull('expiration_date')
+                    ->orWhere('expiration_date', '>=', now()->toDateString());
+            });
+    }
+
+    public function impressions(): HasMany
+    {
+        return $this->hasMany(AdImpression::class);
     }
 }
