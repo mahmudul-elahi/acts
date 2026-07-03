@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'avatar' => $this->avatarUrl(),
             'role' => $this->getRoleNames()->first(),
+            'is_premium' => $this->hasPremiumAccess(),
             'created_at' => $this->created_at?->toISOString(),
         ];
     }
