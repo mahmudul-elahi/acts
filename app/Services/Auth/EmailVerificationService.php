@@ -3,6 +3,7 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
+use App\Notifications\EmailVerifiedNotification;
 
 class EmailVerificationService
 {
@@ -25,6 +26,8 @@ class EmailVerificationService
 
         $user->email_verified_at = now();
         $user->save();
+
+        $user->notify(new EmailVerifiedNotification);
 
         return true;
     }
