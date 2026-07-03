@@ -4,6 +4,7 @@ namespace App\Services\Subscription;
 
 use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Notifications\SubscriptionCancelledNotification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Checkout;
@@ -98,6 +99,10 @@ class SubscriptionService
         }
 
         $subscription->cancel();
+
+        if ($user->wantsSubscriptionAlerts() && $subscription->ends_at) {
+            $user->notify(new SubscriptionCancelledNotification($subscription->ends_at));
+        }
 
         return true;
     }

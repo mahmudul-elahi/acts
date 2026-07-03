@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Models\Payment;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Notifications\SubscriptionPurchasedNotification;
 use App\Services\Stripe\StripePaymentService;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Cashier;
@@ -44,6 +45,10 @@ class RecordLifetimePurchase
         $user->forceFill(['lifetime_access' => true])->save();
 
         $plan = $this->resolvePlan($session['metadata'] ?? []);
+
+        if ($user->wantsSubscriptionAlerts() && $plan) {
+            $user->notify(new SubscriptionPurchasedNotification($plan));
+        }
         $card = $this->stripe->cardForPaymentIntent($session['payment_intent'] ?? null);
         $paidAt = $session['created'] ?? null;
 
