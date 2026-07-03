@@ -19,8 +19,8 @@ class EmailVerifiedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Email Verified Successfully')
-            ->line('Your email has been verified successfully.')
-            ->line('Thank you for verifying your email address.');
+            ->subject('Welcome to Acts')
+            ->line('Welcome to Acts! Your email has been verified successfully.')
+            ->line('We\'re excited to have you on board.');
     }
 }
