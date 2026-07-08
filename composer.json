@@ -22,6 +22,7 @@
         "predis/predis": "^3.5",
         "propaganistas/laravel-disposable-email": "^2.4",
         "socialiteproviders/apple": "^5.10",
+        "spatie/laravel-backup": "^10.3",
         "spatie/laravel-permission": "^8.0",
         "spatie/laravel-query-builder": "^7.3"
     },
