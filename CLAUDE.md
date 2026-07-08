@@ -20,8 +20,10 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/mcp (MCP) - v0
 - laravel/pail (PAIL) - v1
 - laravel/pint (PINT) - v1
+- laravel/sail (SAIL) - v1
 - pestphp/pest (PEST) - v4
 - phpunit/phpunit (PHPUNIT) - v12
+- laravel-echo (ECHO) - v2
 - tailwindcss (TAILWINDCSS) - v4
 
 ## Skills Activation
