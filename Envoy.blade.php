@@ -1,4 +1,4 @@
-@servers(['web' => $server ?? 'deployer@your-server.com'])
+@servers(['web' => $server ?? 'root@156.67.221.155'])
 
 @setup
     $repository = 'git@github.com:mahmudul-elahi/acts.git';
