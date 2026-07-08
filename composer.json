@@ -28,6 +28,7 @@
     "require-dev": {
         "fakerphp/faker": "^1.23",
         "laravel/boost": "^2.2",
+        "laravel/envoy": "^2.12",
         "laravel/pail": "^1.2.5",
         "laravel/pao": "^1.0.6",
         "laravel/pint": "^1.27",
@@ -65,6 +66,14 @@
         "test": [
             "@php artisan config:clear --ansi @no_additional_args",
             "@php artisan test"
+        ],
+        "deploy": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor/bin/envoy run deploy"
+        ],
+        "deploy:quick": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor/bin/envoy run quick"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
