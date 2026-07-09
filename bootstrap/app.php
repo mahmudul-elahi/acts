@@ -20,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ['prefix' => 'api', 'middleware' => ['api', 'auth:sanctum']],
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Octane runs behind nginx on 127.0.0.1, so trust the loopback proxy
+        // to preserve the client's scheme (X-Forwarded-Proto) for URL generation.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'permission' => PermissionMiddleware::class,
             'role' => RoleMiddleware::class,

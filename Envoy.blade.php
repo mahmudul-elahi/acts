@@ -61,9 +61,10 @@
 @endtask
 
 @task('restart-services', ['on' => 'web'])
-    echo "Restarting queues and lifting maintenance mode..."
+    echo "Restarting queues, reloading Octane workers, and lifting maintenance mode..."
     cd {{ $appDir }}
     php artisan queue:restart
+    php artisan octane:reload
     php artisan up
 @endtask
 
